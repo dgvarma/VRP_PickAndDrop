@@ -1,0 +1,17 @@
+#pick_drop_details{
+	width: 30%;
+	height: 300px;
+	margin-left: 35%;
+	margin-top:100px;
+	border: 2px solid black;
+	border-radius: 5px;
+	text-align: center;
+	padding-top: 100px;
+}
+.curr_loc, .pickup_input, .drop_input{
+	margin-bottom: 10px;
+}
+#points{
+	margin-left:100px;
+	margin-top:50px;
+}

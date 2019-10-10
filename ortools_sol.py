@@ -34,6 +34,14 @@ points = {
     '10': '-122.126400,37.403200'
 }
 
+# points = {
+#     '0': '80.228786,12.833183',
+#     '1': '80.227786,12.901150',
+#     '2': '80.222571,12.849674',
+#     '3': '80.261448,12.981419',
+#     '4': '80.257432,12.963277'
+# }
+
 # [START data_model]
 def create_data_model():
     """Stores the data for the problem."""
@@ -70,12 +78,16 @@ def print_solution(data, manager, routing, assignment):
         plan_output = 'Route for vehicle {}:\n'.format(vehicle_id)
         route_duration = 0
         while not routing.IsEnd(index):
-            plan_output += ' {} -> '.format(manager.IndexToNode(index))
+            print(assignment.Value(routing.NextVar(index)))
+            if assignment.Value(routing.NextVar(index)) != 0: 
+                plan_output += ' {} -> '.format(manager.IndexToNode(index))
+            else:
+                plan_output += ' {} '.format(manager.IndexToNode(index))
             previous_index = index
             index = assignment.Value(routing.NextVar(index))
             route_duration += routing.GetArcCostForVehicle(
                 previous_index, index, vehicle_id)
-        plan_output += '{}\n'.format(manager.IndexToNode(index))
+        # plan_output += '{}\n'.format(manager.IndexToNode(index))
         print(plan_output)
         total_duration += route_duration
     total_hours = total_duration/3600
