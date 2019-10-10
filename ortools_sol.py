@@ -105,28 +105,28 @@ def main():
 
     # Define cost of each arc.
     # [START arc_cost]
-    def distance_callback(from_index, to_index):
+    def duration_callback(from_index, to_index):
         """Returns the manhattan distance between the two nodes."""
         # Convert from routing variable Index to distance matrix NodeIndex.
         from_node = manager.IndexToNode(from_index)
         to_node = manager.IndexToNode(to_index)
         return data['duration_matrix'][from_node][to_node]
 
-    transit_callback_index = routing.RegisterTransitCallback(distance_callback)
+    transit_callback_index = routing.RegisterTransitCallback(duration_callback)
     routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
     # [END arc_cost]
 
     # Add Distance constraint.
     # [START distance_constraint]
-    dimension_name = 'Distance'
+    dimension_name = 'Duration'
     routing.AddDimension(
         transit_callback_index,
         slack_max = 0,  # no slack
         capacity = 10800,  # vehicle maximum travel duration
         fix_start_cumul_to_zero = True,  # start cumul to zero
         name = dimension_name)
-    distance_dimension = routing.GetDimensionOrDie(dimension_name)
-    distance_dimension.SetGlobalSpanCostCoefficient(100)
+    duration_dimension = routing.GetDimensionOrDie(dimension_name)
+    duration_dimension.SetGlobalSpanCostCoefficient(100)
     # [END distance_constraint]
 
     # Define Transportation Requests.
@@ -139,8 +139,8 @@ def main():
             routing.VehicleVar(pickup_index) == routing.VehicleVar(
                 delivery_index))
         routing.solver().Add(
-            distance_dimension.CumulVar(pickup_index) <=
-            distance_dimension.CumulVar(delivery_index))
+            duration_dimension.CumulVar(pickup_index) <=
+            duration_dimension.CumulVar(delivery_index))
     # [END pickup_delivery_constraint]
 
     # Setting first solution heuristic.
