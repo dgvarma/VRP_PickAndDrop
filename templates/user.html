@@ -1,48 +1,36 @@
 <html>
 	<head>
 		<title>Rides</title>
-		<link rel="stylesheet" type="text/css" href="{{ url_for('static',    filename='user.css') }}">
+		<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='user.css')}}">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 		<script type="text/javascript">
 			var points = []
 			var pairs = []
-			// window.onload = function(){
-			// 	document.getElementById('getRoute').onclick = function(){
-			// 		sendPoints()
-			// 	};
-			// }
 			function addDepot(long, lat){
 				points[0] = long+","+lat;
 				console.log(points)
 			}
 			function addPairs(pickup_index, drop_index){
 				pairs.push([pickup_index, drop_index])
-			}
-
-			function addRider(pickup_long, pickup_lat, drop_long, drop_lat){
-				points.push(pickup_long+","+pickup_lat);
-				points.push(drop_long+","+drop_lat);
-				addPairs(points.indexOf(pickup_long+","+pickup_lat),points.indexOf(drop_long+","+drop_lat))
-				console.log(points)
 				console.log(pairs)
 			}
-			// function sendPoints(){
-			// 	var pointsJson = JSON.stringify(points)
-			// 	console.log(pointsJson)
-			// 	$.post("points", pointsJson, function(){
 
-			// 	});
-			// 	event.preventDefault();
-			// }
+			function addRider(pickup_address, drop_address){
+				points.push(pickup_address);
+				if(points.indexOf(drop_address) == -1){
+					points.push(drop_address)
+				}
+				addPairs(points.indexOf(pickup_address),points.indexOf(drop_address))
+				console.log(points)
+			}
 			$(function(){
 				$('#getRoute').click(function() {
-				console.log('Button is clicked')
         		$.ajax({
           			type: "POST",
           			contentType: "application/json;charset=utf-8",
           			url: "/points",
           			traditional: "true",
-          			data: JSON.stringify(points),
+          			data: JSON.stringify({'points': points, 'pairs': pairs}),
           			dataType: "json"
           		});
     		});
@@ -57,12 +45,10 @@
 			<input type="text" name="currentlocation" class='curr_loc' id='curr_lat' placeholder="latitude"><br>
 			<button onclick="addDepot(document.getElementById('curr_long').value, document.getElementById('curr_lat').value)">Update</button><br><br>
 			<label for="pickup">Pickup Location: </label>
-			<input type="text" name="pickup" class="pickup_input" id="pickup_long" placeholder="longitude">
-			<input type="text" name="pickup" class="pickup_input" id="pickup_lat" placeholder="latitude"><br>
+			<input type="text" name="pickup" class="pickup_input" id='pickup_address' placeholder="pick up address"><br>
 			<label for="drop">Drop Location: </label>
-			<input type="text" name="drop" class="drop_input" id="drop_long" placeholder="longitude">
-			<input type="text" name="drop" class="drop_input" id="drop_lat" placeholder="latitude"><br>
-			<button onclick="addRider(document.getElementById('pickup_long').value, document.getElementById('pickup_lat').value, document.getElementById('drop_long').value, document.getElementById('drop_lat').value)">Add the route</button>
+			<input type="text" name="drop" class="drop_input" id="drop_address" placeholder="drop address"><br>
+			<button onclick="addRider(document.getElementById('pickup_address').value, document.getElementById('drop_address').value)">Add the route</button><br><br>
 			<button id="getRoute">Get Optimal Route</button>
 		</div>
 		<div id="points">

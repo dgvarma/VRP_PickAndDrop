@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request 
-import json     
+import json
+import ortools_sol     
 
 app = Flask(__name__)
 
@@ -10,7 +11,10 @@ def home():
 @app.route("/points", methods=['POST'])
 def points():
 	route_points = request.get_json()
-	print(route_points)
+	pairs = route_points['pairs']
+	plan_output, total_hours = ortools_sol.getOptimalRoute(route_points['points'], pairs)
+	print(plan_output)
+	print(total_hours)
 	return 'OK'
 
 
