@@ -41,11 +41,10 @@ def print_solution(data, manager, routing, assignment):
             route_duration += routing.GetArcCostForVehicle(
                 previous_index, index, vehicle_id)
         total_duration += route_duration
-    route = route[1:]
     total_hours = total_duration/3600
     print('Total Duration of all routes: {} hrs'.format(total_hours))
-    print('Route: ', route)
-    return route, total_hours
+    print('Route: ', route[1:])
+    return route[1:], total_hours
 
 
 def getOptimalRoute(points, pairs):

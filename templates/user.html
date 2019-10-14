@@ -31,7 +31,10 @@
           			url: "/points",
           			traditional: "true",
           			data: JSON.stringify({'points': points, 'pairs': pairs}),
-          			dataType: "json"
+          			dataType: "json",
+          			success: function(response){
+          				console.log(response)
+          			}
           		});
     		});
 			});
