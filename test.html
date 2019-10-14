@@ -26,6 +26,7 @@ var map = new mapboxgl.Map({
     zoom: 13
 });
 
+
 dirr=new MapboxDirections({
     accessToken: mapboxgl.accessToken,
     profile:'mapbox/driving'
@@ -33,8 +34,11 @@ dirr=new MapboxDirections({
 map.addControl(dirr,
 'top-left');
 
+map.on('load', function () {
 dirr.setOrigin([80.257432,12.963277])
 dirr.setDestination([80.261448,12.981419])
+
+})
 
 </script>
 
