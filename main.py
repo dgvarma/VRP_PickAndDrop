@@ -6,7 +6,12 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("user.html")
+    iframe = 'test.html'
+    return render_template("user.html", iframe=iframe)
+
+@app.route("/test.html")
+def map():
+	return render_template("test.html")
 
 @app.route("/points", methods=['GET','POST'])
 def points():
