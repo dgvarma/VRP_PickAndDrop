@@ -30,15 +30,15 @@ var map = new mapboxgl.Map({
 dirr=new MapboxDirections({
     accessToken: mapboxgl.accessToken,
     profile:'mapbox/driving'
-})
+});
 map.addControl(dirr,
 'top-left');
 
 map.on('load', function () {
-dirr.setOrigin([80.257432,12.963277])
-dirr.setDestination([80.261448,12.981419])
+dirr.setOrigin({{data['A']}});
+dirr.setDestination({{data['B']}});
 
-})
+});
 
 </script>
 

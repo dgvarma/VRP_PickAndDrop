@@ -1,22 +1,51 @@
 #pick_drop_details{
-	width: 30%;
+	width: 50%;
 	height: 250px;
-	margin-left: 35%;
-	margin-top:100px;
-	border: 2px solid black;
-	border-radius: 5px;
+	margin-left: 25%;
+	margin-top:75px;
+	border: none;
+	border-radius: 10px;
 	text-align: center;
 	padding-top: 100px;
+	background-color: #ffffff;
+	box-shadow: 0px 0px 2px 2px #DCDCDC;
 }
-.curr_loc{
-	margin-bottom: 10px;
+
+#content{
+	width: 50%;
+	height: 100%;
+	margin-left: 0%;
+	float: left;
+	background-color: #fffee4;
 }
-.pickup_input, .drop_input{
+.locations_input{
 	margin-bottom: 10px;
-	width: 70%;
-	height: 25px;
+	width: 80%;
+	height:40px;
+	border: 2px solid #DCDCDC;
+	border-radius: 5px;
+	padding-left: 20px;
 }
 #points{
-	margin-left:500px;
+	margin-left:50px;
 	margin-top:50px;
+}
+#map{
+	width: 50%;
+	height: 100%;
+	margin-left: 50%;
+	margin-top: 0px;
+	padding-top: 0px;
+}
+iframe{
+	border: none;
+}
+.buttons{
+	background-color: #094c72; 
+	border: none; 
+	height: 25px; 
+	color: white; 
+	width: 150px; 
+	border-radius: 2px;
+	margin: 10px 0px 10px 0px;
 }

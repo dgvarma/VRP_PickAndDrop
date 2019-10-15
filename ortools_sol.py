@@ -53,6 +53,10 @@ def getOptimalRoute(points, pairs):
 
     data = create_data_model(lat_long_points, pairs)
 
+    print(lat_long_points)
+
+    print(data)
+
     manager = pywrapcp.RoutingIndexManager(
         len(data['duration_matrix']), data['num_vehicles'], data['depot'])
 

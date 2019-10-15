@@ -4,24 +4,38 @@
 		<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='user.css')}}">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 		<script type="text/javascript">
-			var points = []
-			var pairs = []
-			function addDepot(long, lat){
-				points[0] = long+","+lat;
-				console.log(points)
-			}
+			var pairs = [];
+			var visited = [];
+			var non_visited = [];
+			current_location = '-122.128646,37.429086';
+			non_visited[0] = current_location;
 			function addPairs(pickup_index, drop_index){
-				pairs.push([pickup_index, drop_index])
-				console.log(pairs)
+				pairs.push([pickup_index, drop_index]);
 			}
-
-			function addRider(pickup_address, drop_address){
-				points.push(pickup_address);
-				if(points.indexOf(drop_address) == -1){
-					points.push(drop_address)
+			function markVisited(ID){
+				document.getElementById(ID).style.backgroundColor = 'red';
+				value = document.getElementById(ID).innerHTML;
+				visited.push(value);
+				let index = non_visited.indexOf(value);
+				if(index>-1){
+					non_visited.splice(index, 1);
 				}
-				addPairs(points.indexOf(pickup_address),points.indexOf(drop_address))
-				console.log(points)
+				for(i=0;i<pairs.length;i++){
+					if(pairs[i].includes(index)){
+						pairs.splice(i,1);
+					}
+				}
+			}
+			function addRider(pickup_address, drop_address){
+				non_visited.push(pickup_address);
+				if(non_visited.indexOf(drop_address) == -1){
+					non_visited.push(drop_address);
+				}
+				addPairs(non_visited.indexOf(pickup_address),non_visited.indexOf(drop_address));
+				var location_inputs = document.getElementsByClassName('locations_input');
+				for(i=0;i<location_inputs.length;i++){
+					location_inputs[i].value = '';
+				}
 			}
 			$(function(){
 				$('#getRoute').click(function() {
@@ -30,10 +44,27 @@
           			contentType: "application/json;charset=utf-8",
           			url: "/points",
           			traditional: "true",
-          			data: JSON.stringify({'points': points, 'pairs': pairs}),
+          			data: JSON.stringify({'points': non_visited, 'pairs': pairs}),
           			dataType: "json",
           			success: function(response){
-          				console.log(response)
+          				document.getElementById('route').innerHTML = "";
+          				for(i=0;i<response['Addresses'].length;i++){
+          					let btn = document.createElement('BUTTON');
+          					let new_line = document.createElement('BR');
+          					btn.style.color = 'white';
+          					btn.style.width = '600px';
+          					btn.style.height = '25px';
+          					btn.style.marginBottom = '10px';
+          					btn.style.backgroundColor = 'green';
+          					btn.style.border = 'none';
+          					btn.innerHTML = response['Addresses'][i];
+          					btn.id = 'address'+i.toString();
+          					btn.addEventListener('click', function(){
+          						markVisited(btn.id);
+          					});
+          					document.getElementById('route').appendChild(btn);
+          					document.getElementById('route').appendChild(new_line);
+          				}
           			}
           		});
     		});
@@ -42,21 +73,20 @@
 		</script>
 	</head>
 	<body>
-		<div id = "pick_drop_details">
-			<label for="currentlocation">Current Location: </label>
-			<input type="text" name="currentlocation" class='curr_loc' id='curr_long' placeholder="longitude">
-			<input type="text" name="currentlocation" class='curr_loc' id='curr_lat' placeholder="latitude"><br>
-			<button onclick="addDepot(document.getElementById('curr_long').value, document.getElementById('curr_lat').value)">Update</button><br><br>
-			<label for="pickup">Pickup Location: </label>
-			<input type="text" name="pickup" class="pickup_input" id='pickup_address' placeholder="pick up address"><br>
-			<label for="drop">Drop Location: </label>
-			<input type="text" name="drop" class="drop_input" id="drop_address" placeholder="drop address"><br>
-			<button onclick="addRider(document.getElementById('pickup_address').value, document.getElementById('drop_address').value)">Add the route</button><br><br>
-			<button id="getRoute">Get Optimal Route</button>
+		<div id="content">
+			<div id = "pick_drop_details">
+				<input type="text" name="pickup" class="locations_input" id='pickup_address' placeholder="Pick up Location"><br>
+				<input type="text" name="drop" class="locations_input" id="drop_address" placeholder="Drop Location"><br>
+				<button class="buttons" onclick="addRider(document.getElementById('pickup_address').value, document.getElementById('drop_address').value)">Accept Ride</button><br><br>
+				<button class="buttons" id="getRoute">Get Optimal Route</button>
+			</div>
+			<div id="points">
+				<p>Route: (Click on the buttons below to mark the visited addresses)</p>
+				<div id="route"></div>
+			</div>
 		</div>
-		<div id="points">
-			<p>Mark Visited (click): </p>
+		<div id="map">
+			<iframe src="{{ iframe }}" height="100%" width="100%"></iframe>
 		</div>
-		<iframe src="{{ iframe }}" height="500" width="1000"></iframe>
 	</body>
 </html>
