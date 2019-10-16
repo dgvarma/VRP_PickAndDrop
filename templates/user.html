@@ -3,10 +3,15 @@
 		<title>Rides</title>
 		<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='user.css')}}">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+		<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.js'></script>
+    	<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.css' rel='stylesheet' />
+    	<script src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.0.2/mapbox-gl-directions.js'></script>
+		<link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.0.2/mapbox-gl-directions.css' type='text/css' />
 		<script type="text/javascript">
 			var pairs = [];
 			var visited = [];
 			var non_visited = [];
+			var geo_coordinates_order = [];
 			current_location = '-122.128646,37.429086';
 			non_visited[0] = current_location;
 			function addPairs(pickup_index, drop_index){
@@ -48,6 +53,8 @@
           			dataType: "json",
           			success: function(response){
           				document.getElementById('route').innerHTML = "";
+          				geo_coordinates_order = response['GeoCoordinates']
+          				console.log(geo_coordinates_order)
           				for(i=0;i<response['Addresses'].length;i++){
           					let btn = document.createElement('BUTTON');
           					let new_line = document.createElement('BR');
@@ -69,7 +76,21 @@
           		});
     		});
 			});
-			
+			$(function(){
+				$('#check').click(function(){
+					geo_coordinates_order.unshift([-122.128646,37.429086]);
+					$.ajax({
+						type: "POST",
+	          			contentType: "application/json;charset=utf-8",
+	          			url: "/test.html",
+	          			data: JSON.stringify({'points': geo_coordinates_order}),
+	          			success: function(response){
+	          				$('#frame').empty();
+	          				$('#frame').append(response);
+	          			}
+					});
+				});
+			});
 		</script>
 	</head>
 	<body>
@@ -79,14 +100,15 @@
 				<input type="text" name="drop" class="locations_input" id="drop_address" placeholder="Drop Location"><br>
 				<button class="buttons" onclick="addRider(document.getElementById('pickup_address').value, document.getElementById('drop_address').value)">Accept Ride</button><br><br>
 				<button class="buttons" id="getRoute">Get Optimal Route</button>
+				<button class="buttons" id="check">Navigate</button>
 			</div>
 			<div id="points">
 				<p>Route: (Click on the buttons below to mark the visited addresses)</p>
 				<div id="route"></div>
 			</div>
 		</div>
-		<div id="map">
-			<iframe src="{{ iframe }}" height="100%" width="100%"></iframe>
+		<div id="frame">
+			<iframe id="mapFrame" src="{{ iframe }}" height="100%" width="100%" style="border: none;"></iframe>
 		</div>
 	</body>
 </html>

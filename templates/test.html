@@ -8,7 +8,7 @@
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.4.0/mapbox-gl.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
+        #map { position:absolute; top:0; bottom:0; width:{{custom_width}}%;}
     </style>
 </head>
 <body>
@@ -22,7 +22,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoicHJhY2hpdHlhZ2k0NDciLCJhIjoiY2sxaG5lNWloMWhjc
 var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v11',
-    center: [80.222571,12.849674],
+    center: [-122.143936,37.468319],
     zoom: 13
 });
 
@@ -31,13 +31,16 @@ dirr=new MapboxDirections({
     accessToken: mapboxgl.accessToken,
     profile:'mapbox/driving'
 });
-map.addControl(dirr,
-'top-left');
+map.addControl(dirr,'top-left');
 
 map.on('load', function () {
-dirr.setOrigin({{data['A']}});
-dirr.setDestination({{data['B']}});
+    try{
+        dirr.setOrigin({{start}});
+        dirr.setDestination({{end}});
+    }
+    catch(e){
 
+    };
 });
 
 </script>

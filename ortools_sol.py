@@ -99,4 +99,6 @@ def getOptimalRoute(points, pairs):
  
     if assignment:
         plan_output, total_hours = print_solution(data, manager, routing, assignment)
-        return plan_output, total_hours
+        ordered_lat_long_strings = [lat_long_points[str(x)] for x in plan_output]
+        ordered_lat_long = [[float(point) for point in x.split(',')] for x in ordered_lat_long_strings]
+        return plan_output, total_hours, ordered_lat_long
