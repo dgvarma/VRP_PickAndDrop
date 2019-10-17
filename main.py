@@ -17,8 +17,8 @@ def map():
 		coordinates = request.get_json()
 		print(coordinates)
 		print(coordinates['points'])
-		l = len(coordinates['points'])
-		return render_template("test.html", start = coordinates['points'][0], end= coordinates['points'][l-1], custom_width = 50)
+		# l = len(coordinates['points'])
+		return render_template("test.html", start = coordinates['points'][0], end= coordinates['points'][1], custom_width = 50)
 
 @app.route("/points", methods=['POST'])
 def points():

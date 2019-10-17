@@ -30,6 +30,9 @@
 						pairs.splice(i,1);
 					}
 				}
+				console.log(visited);
+				console.log(non_visited);
+				document.getElementById(ID).remove();
 			}
 			function addRider(pickup_address, drop_address){
 				non_visited.push(pickup_address);
@@ -103,7 +106,7 @@
 				<button class="buttons" id="check">Navigate</button>
 			</div>
 			<div id="points">
-				<p>Route: (Click on the buttons below to mark the visited addresses)</p>
+				<p>Route: (Click on the buttons below to mark/remove the visited places)</p>
 				<div id="route"></div>
 			</div>
 		</div>
