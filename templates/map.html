@@ -29,7 +29,11 @@ var map = new mapboxgl.Map({
 
 dirr=new MapboxDirections({
     accessToken: mapboxgl.accessToken,
-    profile:'mapbox/driving'
+    profile:'mapbox/driving',
+    controls: {
+        inputs: false,
+        instructions: true
+    }
 });
 map.addControl(dirr,'top-left');
 

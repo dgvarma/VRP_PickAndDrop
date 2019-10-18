@@ -39,17 +39,23 @@ def print_solution(data, manager, routing, assignment):
     total_hours = total_duration/3600
     return route
 
-
-def getOptimalRoute(driver_initial_location, visited_points, route_points, source_destination_pairs):
-
-    lat_long_points= data_getter.getLatLong(route_points)
-
-    if len(visited_points)==0:
-        lat_long_points.insert(0, driver_initial_location)
+def getCurrentLocation(last_visited_point, to_be_visited_point):
+    if type(last_visited_point)==str:
+        last_visited_lat_long = data_getter.getLatLong(last_visited_point)
     else:
-        last_visited_lat_long = data_getter.getLatLong(visited_points[-1])
-        driver_current_location = data_getter.getCurrentLocation(last_visited_lat_long, lat_long_points[0])
-        lat_long_points.insert(0, driver_current_location)
+        last_visited_lat_long = last_visited_point
+    to_be_visited_lat_long = data_getter.getLatLong(to_be_visited_point)
+    driver_current_location = data_getter.getCurrentLocation(last_visited_lat_long, to_be_visited_lat_long)
+    return driver_current_location
+
+
+def getOptimalRoute(route_points, source_destination_pairs):
+
+    print("Route Points sent: ", route_points)
+
+    lat_long_points= data_getter.getLatLong(route_points[1:])
+
+    lat_long_points.insert(0, route_points[0])
 
     data = create_data_model(lat_long_points, source_destination_pairs)
 

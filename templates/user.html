@@ -22,7 +22,12 @@
           				if(response['status']=='AddressVisited'){
           					ordered_coordinates = response['ordered_coordinates'];
           					document.getElementById(ID).remove();
-          					$.ajax({
+          				}
+          				if(response['status']=='TripEnded'){
+          					document.getElementById('route').innerHTML = "<h3 style='color: green'>Trip Ended</h3>";
+          					ordered_coordinates = response['ordered_coordinates'];
+          				}
+          				$.ajax({
 								type: "POST",
 			          			contentType: "application/json;charset=utf-8",
 			          			url: "/map.html",
@@ -30,12 +35,8 @@
 			          			success: function(response){
 			          				$('#frame').empty();
 			          				$('#frame').append(response);
-			          			}
-							});
-          				}
-          				if(response['status']=='TripEnded'){
-          					document.getElementById('route').innerHTML = "<h3 style='color: green'>Trip Ended</h3>";
-          				}
+			          		}
+						});
           			}
 				});
 			}
@@ -58,8 +59,8 @@
           					let btn = document.createElement('BUTTON');
           					let new_line = document.createElement('BR');
           					btn.style.color = 'white';
-          					btn.style.width = '600px';
-          					btn.style.height = '25px';
+          					btn.style.width = '80%';
+          					// btn.style.height = '25px';
           					btn.style.marginBottom = '10px';
           					btn.style.backgroundColor = 'green';
           					btn.style.border = 'none';
@@ -71,23 +72,19 @@
           					document.getElementById('route').appendChild(btn);
           					document.getElementById('route').appendChild(new_line);
           				}
+          				$.ajax({
+							type: "POST",
+		          			contentType: "application/json;charset=utf-8",
+		          			url: "/map.html",
+		          			data: JSON.stringify(ordered_coordinates),
+		          			success: function(response){
+		          				$('#frame').empty();
+		          				$('#frame').append(response);
+		          			}
+						});
           			}
 				});
 			}
-			$(function(){
-				$('#navigate').click(function(){
-					$.ajax({
-						type: "POST",
-	          			contentType: "application/json;charset=utf-8",
-	          			url: "/map.html",
-	          			data: JSON.stringify(ordered_coordinates),
-	          			success: function(response){
-	          				$('#frame').empty();
-	          				$('#frame').append(response);
-	          			}
-					});
-				});
-			});
 		</script>
 	</head>
 	<body>
@@ -96,7 +93,6 @@
 				<input type="text" name="pickup" class="locations_input" id='pickup_address' placeholder="Pick up Location"><br>
 				<input type="text" name="drop" class="locations_input" id="drop_address" placeholder="Drop Location"><br>
 				<button class="buttons" onclick="addRider(document.getElementById('pickup_address').value, document.getElementById('drop_address').value)">Accept Ride</button><br><br>
-				<button class="buttons" id="navigate">Navigate</button>
 			</div>
 			<div id="points">
 				<p>Route: (Click on the buttons below to mark/remove the visited places)</p>

@@ -32,6 +32,7 @@ def GetDurationMatrix(points):
 
 def getLatLong(route_points):
     lat_long_points = []
+    print("Points received to get lat long: ", route_points)
     if type(route_points)==list:
         for i in range(len(route_points)):
             geo_loc = geocoder.mapquest(route_points[i], key = API_KEY)
@@ -49,9 +50,9 @@ def getCurrentLocation(visited_point, to_be_visited_point):
         to_be_visited_point_string = ','.join(map(str, to_be_visited_point))
         url = "http://router.project-osrm.org/route/v1/driving/" + visited_point_string + ";" + to_be_visited_point_string + "?steps=true&alternatives=false&overview=full"
         output = getAPIResponse(url)
-        pattern = "-?\d+\.+\d+\,+\d+\.+\d"
+        pattern = "-?\d+\.+\d+\,+\d+\.+\d+"
         mid_geo_points = re.findall(pattern, output)
-    driver_current_location = random.choice(mid_geo_points)
+    driver_current_location = random.choice(list(set(mid_geo_points)))
     driver_current_location = [float(point) for point in driver_current_location.split(',')]
     return driver_current_location
 
