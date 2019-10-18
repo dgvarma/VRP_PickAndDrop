@@ -1,34 +1,71 @@
 from flask import Flask, render_template, request 
-import json
-import ortools_sol     
+import json, geocoder, re
+import ortools_sol  
 
 app = Flask(__name__, template_folder = 'templates')
 
+driver_initial_location = [-122.128646,37.429086]
+
+visited_addresses = []
+non_visited_addresses = []
+source_destination_pairs = []
+ordered_addresses = []
+
 @app.route("/")
 def home():
-	iframe = 'test.html'
+	iframe = 'map.html'
 	return render_template("user.html", iframe=iframe)
 
-@app.route("/test.html", methods=['GET','POST'])
+@app.route("/map.html", methods=['GET','POST'])
 def map():
 	if request.method=='GET':
-		return render_template("test.html", custom_width = 100)
+		return render_template("map.html", center=driver_initial_location, custom_width = 100)
 	if request.method=='POST':
-		coordinates = request.get_json()
-		print(coordinates)
-		print(coordinates['points'])
-		# l = len(coordinates['points'])
-		return render_template("test.html", start = coordinates['points'][0], end= coordinates['points'][1], custom_width = 50)
+		ordered_coordinates = request.get_json()
+		start_coordinate = ordered_coordinates[0]
+		end_coordinate = ordered_coordinates[1]
+		return render_template("map.html", center=driver_initial_location, start = start_coordinate, end= end_coordinate, custom_width = 50)
 
-@app.route("/points", methods=['POST'])
-def points():
-	route_addresses = []
-	route_points = request.get_json()
-	pairs = route_points['pairs']
-	plan_output, total_hours, ordered_lat_long = ortools_sol.getOptimalRoute(route_points['points'], pairs)
-	for point in plan_output:
-		route_addresses.append(route_points['points'][point])
-	return json.dumps({'Route': plan_output, 'Addresses': route_addresses, 'GeoCoordinates': ordered_lat_long})
+@app.route("/markvisited", methods=['POST'])
+def markVisitedAddresses():
+	details_marked = request.get_json()
+	visited_address = details_marked['marked_address']
+	ordered_coordinates = details_marked['ordered_coordinates']
+	for pair in source_destination_pairs:
+		if non_visited_addresses.index(visited_address)+1 in pair:
+			source_destination_pairs.remove(pair)
+			break
+	del ordered_coordinates[ordered_addresses.index(visited_address)+1]
+	non_visited_addresses.remove(visited_address)
+	visited_addresses.append(visited_address)
+	ordered_addresses.remove(visited_address)
+	if len(non_visited_addresses)==0:
+		visited_addresses.clear()
+		source_destination_pairs.clear()
+		ordered_addresses.clear()
+		return json.dumps({'status':'TripEnded'})
+	else:
+		return json.dumps({'status':'AddressVisited', 'ordered_coordinates': ordered_coordinates})
+
+@app.route("/addtoride", methods=['POST'])
+def addPointsToRide():
+	ordered_addresses.clear()
+	new_points = request.get_json()
+	pickup_address = new_points['pickup'].strip()
+	drop_address = new_points['drop'].strip()
+	if pickup_address not in non_visited_addresses:
+		non_visited_addresses.append(pickup_address)
+	if drop_address not in non_visited_addresses:
+		non_visited_addresses.append(drop_address)
+	new_pair = [non_visited_addresses.index(pickup_address)+1, non_visited_addresses.index(drop_address)+1]
+	if new_pair not in source_destination_pairs:
+		source_destination_pairs.append(new_pair)
+	plan_output, ordered_lat_long = ortools_sol.getOptimalRoute(driver_initial_location, visited_addresses, non_visited_addresses, source_destination_pairs)
+	ordered_coordinates = ordered_lat_long
+	for point in plan_output[1:]:
+		ordered_addresses.append(non_visited_addresses[point-1])
+	return json.dumps({'route_addresses': ordered_addresses, 'ordered_coordinates': ordered_coordinates})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

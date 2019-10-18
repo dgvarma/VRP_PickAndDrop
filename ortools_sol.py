@@ -3,6 +3,8 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 import data_getter
 
+# driver_initial_location = [-122.128646,37.429086]
+
 def create_data_model(points, pairs):
     data = {}
 
@@ -10,14 +12,7 @@ def create_data_model(points, pairs):
 
     while 'Too Many Requests' in duration_matrix:
         duration_matrix[0] = data_getter.GetDurationMatrix(points)
-
-    #removing the depot from the points
-
-    duration_matrix[0][0] = [0] * len(duration_matrix[0][0])
-
-    for row in duration_matrix[0]:
-        row[0] = 0
-
+        
     data['duration_matrix'] = duration_matrix[0]
     
     data['pickups_deliveries'] = pairs
@@ -42,20 +37,21 @@ def print_solution(data, manager, routing, assignment):
                 previous_index, index, vehicle_id)
         total_duration += route_duration
     total_hours = total_duration/3600
-    print('Total Duration of all routes: {} hrs'.format(total_hours))
-    print('Route: ', route[1:])
-    return route[1:], total_hours
+    return route
 
 
-def getOptimalRoute(points, pairs):
+def getOptimalRoute(driver_initial_location, visited_points, route_points, source_destination_pairs):
 
-    lat_long_points= data_getter.getLatLong(points)
+    lat_long_points= data_getter.getLatLong(route_points)
 
-    data = create_data_model(lat_long_points, pairs)
+    if len(visited_points)==0:
+        lat_long_points.insert(0, driver_initial_location)
+    else:
+        last_visited_lat_long = data_getter.getLatLong(visited_points[-1])
+        driver_current_location = data_getter.getCurrentLocation(last_visited_lat_long, lat_long_points[0])
+        lat_long_points.insert(0, driver_current_location)
 
-    print(lat_long_points)
-
-    print(data)
+    data = create_data_model(lat_long_points, source_destination_pairs)
 
     manager = pywrapcp.RoutingIndexManager(
         len(data['duration_matrix']), data['num_vehicles'], data['depot'])
@@ -98,7 +94,6 @@ def getOptimalRoute(points, pairs):
     assignment = routing.SolveWithParameters(search_parameters)
  
     if assignment:
-        plan_output, total_hours = print_solution(data, manager, routing, assignment)
-        ordered_lat_long_strings = [lat_long_points[str(x)] for x in plan_output]
-        ordered_lat_long = [[float(point) for point in x.split(',')] for x in ordered_lat_long_strings]
-        return plan_output, total_hours, ordered_lat_long
+        plan_output = print_solution(data, manager, routing, assignment)
+        ordered_lat_long = [lat_long_points[x] for x in plan_output]
+        return plan_output, ordered_lat_long
